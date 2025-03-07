@@ -90,18 +90,30 @@ app.listen(process.env.PORT || 3000, console.log('App available on http://localh
 const http = require('http');
 const https = require('https');
 const express = require('express');
+const path = require('path');
+
+
 const { readFile } = require('fs').promises;
 const app = express()
 
+app.use(express.static(path.join(__dirname, 'asserts')));
 
-app.get('/', async (require, response) => {
+const hostname = process.env.HOSTNAME || 'localhost'; // Fallback to localhost if not set
+const port = process.env.PORT || 3000; // Fallback to port 3000 if not set
+
+app.get('/', async (request, response) => {
 
     response.send(await readFile('./home.html', 'utf8'));
 
 });
 
-http.createServer(app).listen(8080);
-https.createServer(app).listen(443);
+http.createServer(app).listen(port, () => {
+    console.log('App available on http://' + hostname + ':' + port);
+});
+
+https.createServer(app).listen(443, () => {
+    console.log('App available on https://' + hostname + ':443');
+});
 
 
 
